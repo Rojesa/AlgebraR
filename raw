@@ -6,7 +6,7 @@ Miembros = σ rol = 'Miembro' (Participante)
 
 b.
 
-M18 = σ fecha_nacimiento <= DATE('2005-09-24') (Persona)
+M18 = σ fecha_nacimiento >= DATE('2005-09-24') (Persona)
 hombres = σ genero = 'M' (Persona)
 M18_hombres = M18 ∩ hombres
 Resultado = γ count(Persona.pid) → conteo(M18_hombres)
@@ -62,21 +62,29 @@ g.
 
 Lideres = σ rol = 'Lider' (Participante)
 Miembros = σ rol = 'Miembro' (Participante)
-L = πnombree(Lideres) ∩ πnombree(Miembros)
-K = (Proyecto)⨝ nombree = Participante.nombree (L)
-Final = πVota.id,Vota.calificacion ((K)⨝ Proyecto.id = Vota.id (Vota))
-Vota.id F avg Vota.calificacion (Final)
+L = π nombree (Lideres) ∩ π nombree (Miembros)
+K = Proyecto ⨝ nombree = nombree (L)
+Final = π Vota.id, Vota.calificacion (K ⨝ Proyecto.id = Vota.id (Vota))
+Resultado = γ Vota.id; avg(Vota.calificacion) → promedio (Final)
+Resultado
 
 h.
 
-C1 = γ nombree; count(id) → conteo (Proyecto)
-K1 = σconteo = 3(C1)
-P1 = ρ P1(Proyecto)
-K2 = πP1.nombree,P1.id (K1 ⨝ nombree = P1.nombree (P1))
-T1 = γ id; avg(calificacion) → promedio (Vota)
-T2 = πP1.id,promedio, nombree (K2 ⨝ P1.id = Vota.id (T1))
-R = γ nombree; avg(promedio) → promedio_calificaciones (T2)
-R 
+r1 = γ nombree; count(nombree) → conteo(Proyecto)
+r2 = ρ r2 (σconteo = 3(r1))
+r3 = γ id; avg(calificacion) -> promedio (Vota)
+r4 = πid Proyecto
+r5 = r3 ⨝ id = id (r4)
+r7 = γ id; avg(Vota.calificacion) -> promedio(Vota)
+r8 = r7 ⨝ Proyecto.id = Vota.id (Proyecto)
+r9 = r2 ⨝ r2.nombree = Proyecto.nombree (r8)
+r10 = γ Proyecto.nombree; avg(promedio) -> promedioTotal (r9)
+r11 = γ Proyecto.nombree; avg(promedio) -> promedioTotal (r9)
+r12 = γ promedioTotal; COUNT(Proyecto.nombree) -> conteo (r11)
+r13 = σ conteo > 1 (r12)
+r14 = r11 ⨝ r13
+r15 = πProyecto.nombree(r14)
+r15
 
 j.
 
@@ -90,6 +98,6 @@ R = γ nombree; avg(promedio) → promedio_calificaciones (T2)
 
 L1 = ρ L1 (R)
 L2 = ρ L2 (R)
-LL1 = (L2)⨝promedio_calificaciones < L1.promedio_calificaciones (L1)
+LL1 = (L2)⨝promedio_calificaciones > L1.promedio_calificaciones (L1)
 LL2 = πnombree(R)-πL2.nombree(LL1)
 LL2
