@@ -1,0 +1,99 @@
+a.
+
+Lideres = σ rol = 'Lider' (Participante)
+Miembros = σ rol = 'Miembro' (Participante)
+πnombree(Participante) - (πnombree(Lideres) ∩ πnombree(Miembros))
+
+b.
+
+M18 = σ fecha_nacimiento <= DATE('2005-09-24') (Persona)
+hombres = σ genero = 'M' (Persona)
+M18_hombres = M18 ∩ hombres
+Resultado = γ count(Persona.pid) → conteo(M18_hombres)
+Resultado
+
+c.
+
+VotosJueces = π pid, id (Vota)
+Proyectos = π id (Proyecto)
+VotosJueces ÷ Proyectos
+
+d.
+
+MA = σ nro_proy > 10 (Mentor)
+tempo = πPersona.nombre, Persona.fecha_nacimiento,Persona.pid((MA) ⨝ Persona.pid = pid (Persona))
+R1 = ρ R1 tempo
+R2 = ρ R2 tempo
+L1 = (R1) ⨝ fecha_nacimiento < R2.fecha_nacimiento (R2)
+L2 = πfecha_nacimiento(R2) - πR1.fecha_nacimiento(L1)
+
+πPersona.pid,Persona.nombre,Persona.fecha_nacimiento((L2)⨝Persona.fecha_nacimiento=fecha_nacimiento (tempo))
+
+e.
+
+P = πfecha_registro(Participante)
+P1 = ρ P1 P
+P2 = ρ P2 P
+R1 = (P2)⨝fecha_registro > P1.fecha_registro (P1)
+R2 = πfecha_registro(P)-πP1.fecha_registro(R1)
+/*R2 último*/
+P3 = P1 - R2
+P4 = P2 - R2
+R3 = (P4)⨝fecha_registro > P1.fecha_registro (P3)
+R4 = πfecha_registro(P3)-πP1.fecha_registro(R3)
+/*R4 penúltimo*/
+P5 = P3 - R4
+P6 = P4 - R4
+R5 = (P6)⨝fecha_registro > P1.fecha_registro (P5)
+R6 = πfecha_registro(P5)-πP1.fecha_registro(R5)
+/*R6 antepenúltimo*/
+Int =(R6)⨝P1.fecha_registro = Participante.fecha_registro (Participante)
+πParticipante.pid,Participante.fecha_registro(Int)
+
+
+f.
+
+P2024 = σ fecha_registro < DATE('2024-01-01') (Participante)
+i2024 = P2024 ⨝ pid = Persona.pid (Persona)
+Resultado = γ Persona.genero; count(Participante.pid) → conteo(i2024)
+Resultado
+
+g.
+
+Lideres = σ rol = 'Lider' (Participante)
+Miembros = σ rol = 'Miembro' (Participante)
+L = πnombree(Lideres) ∩ πnombree(Miembros)
+K = (Proyecto)⨝ nombree = Participante.nombree (L)
+Final = πVota.id,Vota.calificacion ((K)⨝ Proyecto.id = Vota.id (Vota))
+Vota.id F avg Vota.calificacion (Final)
+
+h.
+
+C1 = γ nombree; count(id) → conteo (Proyecto)
+K1 = σconteo = 3(C1)
+P1 = ρ P1(Proyecto)
+K2 = πP1.nombree,P1.id (K1 ⨝ nombree = P1.nombree (P1))
+T1 = γ id; avg(calificacion) → promedio (Vota)
+T2 = πP1.id,promedio, nombree (K2 ⨝ P1.id = Vota.id (T1))
+R = γ nombree; avg(promedio) → promedio_calificaciones (T2)
+R 
+
+9.
+
+
+
+10.
+
+C1 = γ nombree; count(id) → conteo (Proyecto)
+K1 = σconteo >= 3(C1)
+P1 = ρ P1(Proyecto)
+K2 = πP1.nombree,P1.id (K1 ⨝ nombree = P1.nombree (P1))
+T1 = γ id; avg(calificacion) → promedio (Vota)
+T2 = πP1.id,promedio, nombree (K2 ⨝ P1.id = Vota.id (T1))
+R = γ nombree; avg(promedio) → promedio_calificaciones (T2)
+
+L1 = ρ L1 (R)
+L2 = ρ L2 (R)
+LL1 = (L2)⨝promedio_calificaciones < L1.promedio_calificaciones (L1)
+LL2 = πnombree(R)-πL2.nombree(LL1)
+LL2
