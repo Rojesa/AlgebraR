@@ -78,11 +78,7 @@ T2 = πP1.id,promedio, nombree (K2 ⨝ P1.id = Vota.id (T1))
 R = γ nombree; avg(promedio) → promedio_calificaciones (T2)
 R 
 
-9.
-
-
-
-10.
+j.
 
 C1 = γ nombree; count(id) → conteo (Proyecto)
 K1 = σconteo >= 3(C1)
